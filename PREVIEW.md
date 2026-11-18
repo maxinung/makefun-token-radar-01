@@ -1,7 +1,7 @@
 # PREVIEW — makefun-token-radar-01 (FASE 1)
 
 **Repo:** https://github.com/maxinung/makefun-token-radar-01
-**Commit:** (to be filled after push)
+**Commit:** cb9382b6ba7ddd10bdb1f8e4345991bbfc192e2b
 **Model:** kimchi-1 (peer-ratio + quality adjustments)
 
 ---
