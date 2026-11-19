@@ -5,9 +5,6 @@
 **Model:** kimchi-1 (peer-ratio + quality adjustments)
 
 ---
----
-*FASE 1b-FIXUP-2 (2026-11-19): 3 screenshot digenerate ulang dari repo root /data/workspace/makefun-token-radar-01 dengan MAKEFUN_OUTPUT_DIR=out. Data diverifikasi: board.json Steakhouse implied_value_usd = 747165361 ($747.2M), model kimchi-1. Kolom Peer Ratio terlihat, tombol dark mode terlihat, panel detail menyebut model kimchi-1. SHA256 screenshot: 8344da28/3b66701b/cd5af3b3 (berbeda dari FASE 1 references). Submit DINYATAKAN di FASE 2 setelah Max review.*
-
 
 ## Top-10 Board (Snapshot 2026-11-14)
 
@@ -108,14 +105,6 @@ Every step includes cost and time estimates. Uncertainty is stated honestly: "(n
 5. **Live token view** — Currently shows market cap; could add mcap/TVL ratio and compare to pre-token peer ratios.
 6. **Farm plan specificity** — Could detect known point programs (LayerZero, Linea, etc.) from external sources, but must stay offline per rules. The current honest "no token recorded" disclaimer is the safe path.
 7. **Performance** — Node 22 runs main.ts in ~400ms. Well under 120s limit.
-
----
-
-## Perbaikan (FASE 1b)
-
-**Perbaikan 1 — Kalimat detail view:** Fixed staleness warning comparison in dashboard/app.js — replaced strict equality `===` with tolerance-based `Math.abs(impliedOf(row, DATA.model) - row.implied_value_usd) <= 1000` (1M USD tolerance). When recomputed value matches board.json within tolerance, shows "verified against board.json"; when values differ beyond 1M, shows "differing from board.json — data would be stale". Verified with Steakhouse Financial and 2 other protocols: warning omitted when values are equal.
-
-**Perbaikan 2 — Desain UI dashboard:** Added hierarki tipografi jelas (judul board, header kolom, angka FDV dibedakan tegas), kolom Peer Ratio setelah kolom age, chip Low/High warna konsisten (merah muda/hijau muda) sejajar semua baris, dan dark mode toggle (light/dark, default light) di index.html. Layout panel detail dirapikan dengan tombol Close terlihat dan jarak antar-bagian konsisten.
 
 ---
 
