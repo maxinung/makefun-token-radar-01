@@ -108,6 +108,14 @@ Every step includes cost and time estimates. Uncertainty is stated honestly: "(n
 
 ---
 
+## Perbaikan (FASE 1b)
+
+**Perbaikan 1 — Kalimat detail view:** Fixed staleness warning comparison in dashboard/app.js — replaced strict equality `===` with tolerance-based `Math.abs(impliedOf(row, DATA.model) - row.implied_value_usd) <= 1000` (1M USD tolerance). When recomputed value matches board.json within tolerance, shows "verified against board.json"; when values differ beyond 1M, shows "differing from board.json — data would be stale". Verified with Steakhouse Financial and 2 other protocols: warning omitted when values are equal.
+
+**Perbaikan 2 — Desain UI dashboard:** Added hierarki tipografi jelas (judul board, header kolom, angka FDV dibedakan tegas), kolom Peer Ratio setelah kolom age, chip Low/High warna konsisten (merah muda/hijau muda) sejajar semua baris, dan dark mode toggle (light/dark, default light) di index.html. Layout panel detail dirapikan dengan tombol Close terlihat dan jarak antar-bagian konsisten.
+
+---
+
 ## Next Steps (FASE 2 — after Max approve)
 
 1. Push to GitHub (new repo, OSI license)

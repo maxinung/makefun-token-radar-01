@@ -6,8 +6,10 @@
 <title>Token Radar: pre-token protocols ranked by implied FDV</title>
 <link rel="stylesheet" href="app.css">
 </head>
-<body>
+<body class="light">
 <a class="skip" href="#board">Skip to the board</a>
+
+<button class="dark-mode-toggle" aria-label="Toggle dark mode" onclick="document.body.className = document.body.className === 'dark' ? 'light' : 'dark'">🌙</button>
 <main id="board" tabindex="-1" aria-busy="true"></main>
 <script src="../data.js"></script>
 <script src="app.js"></script>

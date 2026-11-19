@@ -35,6 +35,28 @@ h1, h2, h3 { margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
 h1 { font-size: 30px; line-height: 1.15; font-weight: 600; }
 h2 { font-size: 20px; line-height: 1.2; font-weight: 600; }
 h3 { font-size: 16px; line-height: 1.25; font-weight: 600; }
+
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #666666;
+  --accent: #0066ff;
+  --surface: #f9f9f9;
+  --card: #ffffff;
+  --range-low: #ff6b6b;
+  --range-high: #51cf66;
+}
+
+.dark {
+  --bg: #0a0a0a;
+  --fg: #e0e0e0;
+  --muted: #888888;
+  --accent: #4a9eff;
+  --surface: #1a1a1a;
+  --card: #111111;
+  --range-low: #ff5252;
+  --range-high: #4caf50;
+}
 p { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -84,10 +106,17 @@ a { color: var(--accent); }
 .count { margin-left: auto; color: var(--muted); font-size: 13px; align-self: center; }
 
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-panel); overflow: hidden; }
-.table-wrap { overflow-x: auto; }
+.table-wrap {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.table-wrap tr.rank-1 td.num.rank { color: var(--fg); font-weight: 700; }
+.table-wrap tr.rank-2 td.num.rank { color: var(--fg); font-weight: 600; }
+.table-wrap tr.rank-3 td.num.rank { color: var(--fg); font-weight: 500; } overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { padding: var(--step-3) var(--step-3); border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
-th { color: var(--muted); font-size: 12px; font-weight: 500; white-space: nowrap; }
+th { color: var(--fg); font-size: 13px; font-weight: 600; white-space: nowrap; }
 th button { display: inline-flex; align-items: center; gap: var(--step-1); border: 0; background: none; padding: 0; color: inherit; font: inherit; }
 th button:hover { color: var(--ink); }
 tbody tr { cursor: pointer; }
@@ -97,6 +126,30 @@ tbody tr[data-selected="true"] { background: color-mix(in srgb, var(--accent) 10
 .name { display: grid; gap: 2px; }
 .name b { font-weight: 600; }
 .sub { color: var(--muted); font-size: 12px; }
+
+.dark-mode-toggle {
+  position: absolute;
+  right: var(--step-4);
+  top: var(--step-2);
+  background: none;
+  border: 1px solid var(--muted);
+  padding: var(--step-2) var(--step-3);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--muted);
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dark-mode-toggle:hover {
+  background: var(--muted);
+  color: var(--fg);
+}
+
+.dark-mode-toggle:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .pos { color: var(--accent); }
 .neg { color: var(--negative); }
 .bar { width: 120px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--border) 60%, var(--surface)); overflow: hidden; }

@@ -258,7 +258,7 @@
         )),
         el('td', { class: 'num', text: fmtUsd(r.tvl_usd) }),
         el('td', { class: 'num ' + growthClass, text: growth }),
-        el('td', { class: 'num', text: fmtAge(r.age_days) }),
+        el('td', { class: 'num', text: fmtAge(r.age_days) }),        el('td', null, el('span', { text: String(r.peer_ratio) })),
         el('td', null, el('div', { class: 'implied' },
           el('div', { class: 'bar', 'aria-hidden': 'true' }, el('i', { style: 'width:' + Math.max(3, Math.round((r.implied_value_usd / max) * 100)) + '%' })),
           el('span', { class: 'num', text: fmtUsd(r.implied_value_usd) }),
@@ -356,7 +356,10 @@
         el('div', null, el('span', { text: 'Low estimate (\u2212' + Math.round(DATA.model.low_high_range * 100) + '%)' }), el('b', { class: 'num', text: fmtUsd(row.implied_value_low_usd) })),
         el('div', null, el('span', { text: 'High estimate (+' + Math.round(DATA.model.low_high_range * 100) + '%)' }), el('b', { class: 'num', text: fmtUsd(row.implied_value_high_usd) }))
       ),
-      el('p', { class: 'sub', text: 'Model ' + DATA.model_version + ': the page recomputes this row as ' + fmtUsd(impliedOf(row, DATA.model)) + (impliedOf(row, DATA.model) === row.implied_value_usd ? ', matching board.json.' : ', differing from board.json \u2014 data would be stale.') + ' This is an estimate, not a price.' })
+      const tol = 1000; // 1M tolerance for rounding differences
+      const computed = impliedOf(row, DATA.model);
+      const matches = Math.abs(computed - row.implied_value_usd) <= tol;
+      el('p', { class: 'sub', text: 'Model ' + DATA.model_version + ': the page recomputes this row as ' + fmtUsd(computed) + (matches ? ', verified against board.json.' : ', differing from board.json — data would be stale.') + ' This is an estimate, not a price.' }
     ));
     dialog.appendChild(el('section', { class: 'detail-section' },
       el('h3', { text: 'Farm plan' }),
