@@ -5,6 +5,9 @@
 **Model:** kimchi-1 (peer-ratio + quality adjustments)
 
 ---
+---
+*FASE 1b-FIXUP-2 (2026-11-19): 3 screenshot digenerate ulang dari repo root /data/workspace/makefun-token-radar-01 dengan MAKEFUN_OUTPUT_DIR=out. Data diverifikasi: board.json Steakhouse implied_value_usd = 747165361 ($747.2M), model kimchi-1. Kolom Peer Ratio terlihat, tombol dark mode terlihat, panel detail menyebut model kimchi-1. SHA256 screenshot: 8344da28/3b66701b/cd5af3b3 (berbeda dari FASE 1 references). Submit DINYATAKAN di FASE 2 setelah Max review.*
+
 
 ## Top-10 Board (Snapshot 2026-11-14)
 
