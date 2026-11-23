@@ -1,17 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied FDV</title>
+<title>Token Launch Radar</title>
 <link rel="stylesheet" href="app.css">
 </head>
-<body class="light">
-<a class="skip" href="#board">Skip to the board</a>
+<body>
+<header class="page-head">
+  <h1>Token Launch Radar</h1>
+  <p class="subtitle">Which pre-token protocol is worth farming next, and what to do about it.</p>
+  <p class="meta" id="meta-line">Loading snapshot…</p>
+</header>
 
-<button class="dark-mode-toggle" aria-label="Toggle dark mode" onclick="document.body.className = document.body.className === 'dark' ? 'light' : 'dark'">🌙</button>
-<main id="board" tabindex="-1" aria-busy="true"></main>
-<script src="../data.js"></script>
+<main>
+  <section class="kpi-strip" id="kpi-strip" aria-label="Key figures"></section>
+
+  <section class="panel" id="model-panel">
+    <h2>How the value is computed</h2>
+    <p class="model-formula">implied value = TVL &times; peer multiple &times; growth &times; age &times; chains</p>
+    <ul class="model-points">
+      <li><strong>Peer multiple:</strong> the median mcap/TVL of the tokened protocols in the same category (only peers with a positive market cap and TVL count). A category with fewer than 3 qualifying peers uses the global median instead, so no single peer can set a category&rsquo;s price.</li>
+      <li><strong>Growth:</strong> 1 + clamp(7-day TVL change, &minus;50%, +100%) / 200. A week&rsquo;s momentum, capped so one wild week cannot 45&times; a value.</li>
+      <li><strong>Age:</strong> 0.85 + 0.15 &times; min(days since listing, 1500) / 1500. A longer record earns a fuller multiple.</li>
+      <li><strong>Chains:</strong> 1 + 0.03 &times; min(chains &minus; 1, 10). Broader reach earns a little more.</li>
+      <li><strong>Eligibility:</strong> a protocol ranks only if it records no token and is not a wrapped, staked or bridged product, a versioned deployment, a CEX, or an exchange&rsquo;s own product. The snapshot&rsquo;s watchlist rule, applied to every row.</li>
+    </ul>
+    <h3>Peer multiples by category</h3>
+    <table class="peer-table">
+      <thead><tr><th>Category</th><th>Tokened peers</th><th>Multiple</th><th>Source</th></tr></thead>
+      <tbody id="peer-body"></tbody>
+    </table>
+    <h3>Self-checks</h3>
+    <ul class="checks" id="self-checks"></ul>
+  </section>
+
+  <section class="panel" id="detail" hidden>
+    <button class="close" id="detail-close" type="button">Close detail</button>
+    <div id="detail-body"></div>
+  </section>
+
+  <section class="panel">
+    <h2>The board</h2>
+    <div class="controls">
+      <label>Search <input id="search" type="search" placeholder="name or slug" autocomplete="off"></label>
+      <label>Category
+        <select id="category-filter"><option value="">All categories</option></select>
+      </label>
+      <label class="check"><input id="watchlist-only" type="checkbox"> Watchlist only</label>
+      <label>Sort
+        <select id="sort">
+          <option value="rank">Rank (implied value)</option>
+          <option value="tvl">TVL, high to low</option>
+          <option value="growth">7-day change, high to low</option>
+          <option value="age">Age, oldest first</option>
+          <option value="name">Name, A to Z</option>
+        </select>
+      </label>
+      <span class="row-count" id="row-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table class="board">
+        <thead>
+          <tr>
+            <th>#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+            <th class="num">TVL</th><th class="num">7d</th><th class="num">Age</th>
+            <th class="num">Peer &times;</th><th class="num">Implied value</th>
+          </tr>
+        </thead>
+        <tbody id="board-body"></tbody>
+      </table>
+    </div>
+    <p class="hint">Click a row for its detail view and farm plan.</p>
+  </section>
+
+  <footer class="page-foot">
+    <p><strong>Honesty note:</strong> every protocol here <em>records no token</em> in the snapshot. That is DefiLlama&rsquo;s record, not proof: a protocol may still have a token its record does not carry. No launch is predicted, and no date is given.</p>
+    <p>Implied values are this entry&rsquo;s own claim about what a token would be worth if the protocol&rsquo;s record stayed as it is. They are not make.fun&rsquo;s claim, and they are not investment advice. Farm only with funds you can afford to leave untouched for months.</p>
+  </footer>
+</main>
+<script src="data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

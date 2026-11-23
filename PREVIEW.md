@@ -1,116 +1,97 @@
-# PREVIEW — makefun-token-radar-01 (FASE 1)
+# Token Launch Radar — PREVIEW
 
-**Repo:** https://github.com/maxinung/makefun-token-radar-01
-**Commit:** cb9382b6ba7ddd10bdb1f8e4345991bbfc192e2b
-**Model:** kimchi-1 (peer-ratio + quality adjustments)
+## What it is
 
----
+A program that reads a sealed DefiLlama snapshot (2026-11-14, 758 protocols) and
+ranks the protocols that record no token by what a launch would be worth, each
+with a concrete plan to farm it. The dashboard shows the board, a detail view
+per protocol, a filter, the model's peer multiples and self-checks — all static,
+no network.
 
-## Top-10 Board (Snapshot 2026-11-14)
+## The model: peer median
 
-| Rank | Protocol | TVL | Implied FDV (Low / Base / High) | Peer Ratio | Key Reason |
-|------|----------|-----|----------------------------------|------------|------------|
-| 1 | Steakhouse Financial | $2.75B | $448M / $747M / $1.05B | 0.2331 | Highest TVL watchlist protocol; 11 chains; 543 days no token; Risk Curator peer ratio 0.23 |
-| 2 | Gauntlet | $1.58B | $264M / $440M / $616M | 0.2331 | 14 chains; positive 7d growth (+5.6%); same peer ratio; 543 days |
-| 3 | Veda | $1.56B | $249M / $416M / $582M | 0.2331 | 13 chains; Onchain Capital Allocator; 632 days; slight 7d decline (-8.3%) |
-| 4 | USDD | $1.06B | $117M / $195M / $273M | 0.1687 | CDP on Tron/Eth/BSC; lower peer ratio (CDP peers cheaper); 611 days |
-| 5 | Upshift | $499M | $84M / $141M / $197M | 0.2331 | 15 chains (most diverse); +8.3% 7d growth; 710 days |
-| 6 | Bittensor dTAO | $376M | $71M / $118M / $165M | 0.3424 | Highest peer ratio (DEX); single chain; only 56 days old |
-| 7 | Nonce Capital | $514M | $66M / $109M / $153M | 0.2331 | 2 chains; very new (45 days); -9.7% 7d |
-| 8 | OnRe | $309M | $54M / $90M / $126M | 0.2748 | RWA on Solana; 488 days; near-flat 7d (+0.1%) |
-| 9 | OpenTrade | $242M | $44M / $73M / $102M | 0.2748 | RWA on 3 chains; 708 days; -1.6% 7d |
-| 10 | RockawayX | $293M | $44M / $73M / $102M | 0.2331 | 10 chains; Risk Curator; 233 days; -2.5% 7d |
+The model was derived from the snapshot itself, not from a design doc. The
+question it answers: *if this protocol launched a token today, what would it be
+worth, judged by what the market already pays for similar tokened protocols?*
 
-*All 40 watchlist protocols covered. 160 early rows (pre-token, TVL < $50M) appended by TVL. Total: 200 rows.*
+**Eligibility.** A protocol ranks only if it records no token (mcap, gecko_id and
+symbol all null) and is not a wrapped, staked or bridged product, a versioned
+deployment, a CEX, or an exchange's own product. That is the snapshot's own
+watchlist rule, applied to every protocol — not just the 40 on the watchlist.
+**198 protocols qualify** (60 at or above the $50M floor, 138 below it); all 40
+watchlist protocols are inside.
 
----
+**Implied value.** For each qualifying protocol:
 
-## How to Run
-
-```bash
-# Clone and install
-git clone https://github.com/maxinung/makefun-token-radar-01
-cd makefun-token-radar-01
-npm install
-
-# Run program (Node 22+)
-mkdir -p out
-MAKEFUN_OUTPUT_DIR=out node main.ts --input input/snapshot.json
-
-# Open dashboard
-open out/dashboard/index.html   # or xdg-open, start, etc.
+```
+implied value = TVL × peer multiple × growth × age × chains
 ```
 
-The program reads `/input/snapshot.json` (758 protocols, 40 watchlist), writes:
-- `out/board.json` — 200 ranked rows with implied FDV, low/high range, farm steps
-- `out/data.js` — compact data for the dashboard
-- `out/dashboard/` — static page (index.html, app.css, app.js)
-- `out/screenshots/` — 3 PNGs (board, detail, filtered)
-- `out/dossier.json` — judge's dossier (auto-built by vendor/makefun-board.ts)
+- **Peer multiple** = the median mcap/TVL of the tokened protocols in the same
+  category (only peers with a positive market cap and TVL count). A category
+  with fewer than 3 qualifying peers uses the **global median 0.214** (128
+  qualifying peers) instead, so no single peer can set a category's price. This
+  matters: Risk Curators' only peer is 2.975× and Chain's only peer is 3.026× —
+  both fall back to the global median. Category multiples actually used:
+  Basis Trading 0.654, Dexs 0.342, RWA 0.275, Yield 0.191, CDP 0.169,
+  Lending 0.132, Yield Aggregator 0.151.
+- **Growth** = 1 + clamp(7-day TVL change, −50%, +100%) / 200. A week's
+  momentum, capped so one wild week cannot 45× a value (the snapshot's biggest
+  7-day move is +4448%).
+- **Age** = 0.85 + 0.15 × min(days since listing, 1500) / 1500. A longer record
+  earns a fuller multiple. Missing listing dates use the pre-token median age
+  (634 days).
+- **Chains** = 1 + 0.03 × min(chains − 1, 10). Broader reach earns a little more.
 
----
+**Farm plans.** 6 steps per row, generated from category templates filled with
+the row's name, primary chain and category: open the protocol on its chain and
+fund a wallet (cost + time stated), the category's core action (deposit, trade,
+provide liquidity, stake, etc.) at a sensible size, a weekly cadence of 4–8
+weeks, record-keeping plus watching official announcements, an official-claims-
+only rule, and a risk check stating the protocol records no token and a launch
+is not guaranteed.
 
-## Test Results
+**Honesty.** Every row is a protocol that *records no token* in the snapshot.
+That is DefiLlama's record, not proof — a protocol may still have a token its
+record does not carry. No launch is predicted and no date is given.
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Board rows ≥ 100 | ✅ | 200 rows (40 watchlist + 160 early) |
-| Watchlist coverage 100% | ✅ | All 40 slugs present |
-| Ranks 1..N unique | ✅ | Verified by boardIssue() |
-| Implied value non-increasing | ✅ | Sorted descending |
-| Farm steps 3–12 per row | ✅ | 6 steps each, 20–600 chars |
-| Low ≤ Base ≤ High | ✅ | ±40% range on every row |
-| Dashboard ≤ 400 files / 4 MiB | ✅ | 3 files, ~33 KiB total |
-| No network in dashboard | ✅ | Only loads local data.js |
-| Screenshots 3×, ≤512 KiB, 1280×800 | ✅ | 138K / 171K / 144K |
-| Dossier matches buildDossier | ✅ | Byte-for-byte verified |
-| Program runs twice, same output | ✅ | Deterministic (no randomness) |
+## Top 5 implied values
 
----
+| Rank | Protocol | Category | TVL | Implied value |
+| --- | --- | --- | --- | --- |
+| 1 | Steakhouse Financial | Risk Curators | $2,753,981,495 | $684,607,708 |
+| 2 | Sentora Curator | Risk Curators | $2,757,585,593 | $579,177,123 |
+| 3 | Gauntlet | Risk Curators | $1,577,685,462 | $407,735,745 |
+| 4 | Veda | Onchain Capital Allocator | $1,563,415,482 | $380,376,089 |
+| 5 | USDD | CDP | $1,055,793,606 | $169,602,659 |
 
-## Model Summary (Kimchi-1)
+## Verification (all checked independently of the program)
 
-**Implied FDV = TVL × peer_ratio × growth_mult × chain_mult × age_mult**
+- `main.ts` runs clean (exit 0): **board.json 198 rows**, watchlist **40/40**,
+  global peer multiple 0.214 (n=128). Board 343,118 bytes (≤8 MiB).
+- Ranks exactly 1..198; implied values non-increasing, all distinct, all
+  positive whole dollars; slugs unique with no whitespace; names non-empty.
+- Farm steps: every row 6 steps, each 20–600 characters.
+- Dashboard: the page recomputes every row's implied value from its own figures
+  with the same formula — the screenshot run checked 198 + 34 rendered rows
+  against board.json, **0 mismatches**. The page's self-checks (watchlist,
+  ranks, recompute, farm steps, no hardcoded names, honesty) all pass live.
+- Screenshots (all viewed, all 1440×900, all different):
+  - `1-board.png` — 145,351 B, sha256 `8b63b815791bb1be242b3d86e042820132e451ec18729bc48491a7f11992638e`
+  - `2-detail.png` — 162,454 B, sha256 `ce22e4b48a994bd7dbf2b06dc7313a4bedfaa2567afc4b705b4f3403c2b689ca`
+  - `3-filtered.png` — 134,399 B, sha256 `d36762b21043fb5bc865403a7d3b9ae801e88e31908791b53d5af16221196789`
+- `dossier.json` 661,952 bytes (≤1.5 MiB); its text is 64,118 bytes, under the
+  65,536-byte cap, so the full dashboard source is inside it. Dashboard source
+  total 63,788 bytes.
+- Determinism: run twice, board.json is byte-identical.
 
-- **peer_ratio**: median mcap/TVL of same-category protocols that *already have tokens* (min 3 peers, else global median 0.15). This is the core differentiator — categories with richer token markets (DEX 0.34, RWA 0.27) get higher base multiples than Liquid Staking (0.04) or CEX (excluded).
-- **growth_mult**: 1 + clamp(7d%, -50, 100)/100 × 0.35 — rewards recent TVL momentum.
-- **chain_mult**: 1 + min(0.35, (chains-1)×0.05) × 0.25 — multi-chain protocols have more airdrop surface.
-- **age_mult**: 0.6 → 1.4 over ~1.5 years (half-life 548 days), weighted at 0.20 — older protocols without tokens are more credible.
-- **range**: base ±40% shown as Low/High in board and detail view.
+## Run it
 
-No protocol name is special-cased. The same function scores every row.
+```sh
+mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+```
 
----
-
-## Farm Plan Design
-
-6 generic-but-category-specific steps per protocol:
-1. Fresh wallet, seed offline
-2. Category action (supply/provide/stake/bridge/deposit/mint) with capital tier from TVL
-3. Weekly qualifying action (deposit/borrow/swap/vote/stake)
-4. Hold for N days (30–60 based on age) to span snapshots
-5. Claim only from protocol's official page, never pay to claim
-6. Keep a farm log (wallet, dates, tx hashes)
-
-Every step includes cost and time estimates. Uncertainty is stated honestly: "(no token recorded; a launch is not guaranteed)". No invented point programs or specific campaigns.
-
----
-
-## What Can Be Improved
-
-1. **Peer ratio depth** — Some categories have <3 token peers; global median fallback dilutes signal. Could borrow from adjacent categories or use DefiLlama's broader history.
-2. **Chain diversity weighting** — Current linear (chains-1)×0.05 caps at 7 chains. Could weight by ecosystem relevance (EVM vs non-EVM, mainnet vs testnet).
-3. **Growth signal** — 7d TVL change is noisy. A 30d or 90d trend, or TVL acceleration, would be more robust.
-4. **Dashboard polish** — Add column for peer ratio, sparklines for TVL history, export CSV, dark mode toggle.
-5. **Live token view** — Currently shows market cap; could add mcap/TVL ratio and compare to pre-token peer ratios.
-6. **Farm plan specificity** — Could detect known point programs (LayerZero, Linea, etc.) from external sources, but must stay offline per rules. The current honest "no token recorded" disclaimer is the safe path.
-7. **Performance** — Node 22 runs main.ts in ~400ms. Well under 120s limit.
-
----
-
-## Next Steps (FASE 2 — after Max approve)
-
-1. Push to GitHub (new repo, OSI license)
-2. Verify CI passes (gate checks)
-3. Submit via lucky-otter-66 account
-4. Monitor dev heat provisional rate
+`main.ts` reads `input/snapshot.json` (or `--input <path>` / `/input/snapshot.json`),
+writes `out/board.json`, copies `dashboard/` and `screenshots/` into `out/`,
+writes the dashboard's `data.js`, and builds `out/dossier.json` with
+`vendor/makefun-board.ts`. The dashboard renders with no network.
